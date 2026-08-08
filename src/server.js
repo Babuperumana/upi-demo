@@ -324,6 +324,18 @@ app.get('/payments/:orderId/qr/uri', (req, res) => {
 
 // ---- Payment Status Page (SSE + fallback) ----
 
+app.get('/pay/demo', async (req, res) => {
+  try {
+    const merchants = db.getActiveMerchants();
+    if (!merchants.length) return res.redirect('/setup');
+    const merchant = merchants[0];
+    const session = paymentService.createPayment(merchant.id, { amount: 1.00, metadata: { demo: true } });
+    res.redirect(`/pay/${session.order_id}`);
+  } catch (err) {
+    res.status(500).send(`Error: ${err.message}`);
+  }
+});
+
 app.get('/pay/:orderId', async (req, res) => {
   try {
     const payment = db.getPaymentByOrderId(req.params.orderId);
