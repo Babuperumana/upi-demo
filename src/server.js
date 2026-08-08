@@ -5,7 +5,7 @@
  * Deploy: push to GitHub → connect to Coolify → done.
  */
 
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const express = require('express');
 const cors = require('cors');
 const QRCode = require('qrcode');
@@ -662,15 +662,34 @@ app.get('/pay/demo', (req, res) => {
 // ---- Boot: auto-register merchants and start polling ----
 
 function boot() {
-  const merchants = db.getActiveMerchants();
-  merchants.forEach(m => {
-    try { paymentService.registerMerchant(m); }
-    catch (err) { console.error(`Failed to boot merchant ${m.id}:`, err.message); }
-  });
-  console.log(`UPI Demo started on ${HOST}:${PORT}`);
-  console.log(`Dashboard: http://localhost:${PORT}`);
-  console.log(`Health:    http://localhost:${PORT}/health`);
-  console.log(`Merchants: ${merchants.length} active`);
+  try {
+    const merchants = db.getActiveMerchants();
+    merchants.forEach(m => {
+      try { paymentService.registerMerchant(m); }
+      catch (err) { console.error(`[WARN] Failed to boot merchant ${m.id}:`, err.message); }
+    });
+    console.log(`[OK] UPI Demo started on ${HOST}:${PORT}`);
+    console.log(`[OK] Dashboard: http://localhost:${PORT}`);
+    console.log(`[OK] Health:    http://localhost:${PORT}/health`);
+    console.log(`[OK] Merchants: ${merchants.length} active`);
+  } catch (err) {
+    console.error('[FATAL] Boot failed:', err.message);
+    console.error(err.stack);
+  }
 }
 
-app.listen(PORT, HOST, boot);
+process.on('unhandledRejection', (err) => {
+  console.error('[unhandledRejection]', err.message);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('[uncaughtException]', err.message, err.stack);
+  process.exit(1);
+});
+
+const server = app.listen(PORT, HOST, boot);
+
+server.on('error', (err) => {
+  console.error('[FATAL] Server error:', err.message);
+  process.exit(1);
+});

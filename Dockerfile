@@ -19,5 +19,7 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOST=0.0.0.0
 ENV DB_PATH=/app/data/upi-demo.db
+# Suppress dotenvx informational tips in logs
+ENV DOTENVX_TIP_DISABLED=true
 
 CMD ["node", "src/server.js"]
