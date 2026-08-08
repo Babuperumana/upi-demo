@@ -11,6 +11,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@babuperumana/upipg": "^1.0.2",
     "@babuperumana/upipg-new": "^1.0.0",
     "axios": "^1.7.0",
     "better-sqlite3": "^13.0.2",
