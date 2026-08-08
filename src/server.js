@@ -686,8 +686,27 @@ app.get('/merchants/:id/transactions/raw', async (req, res) => {
 
 function boot() {
   try {
-    const merchants = db.getActiveMerchants();
+    let merchants = db.getActiveMerchants();
     console.log(`[BOOT] Demo DB merchants: ${merchants.length} active`);
+
+    // Auto-seed merchant from env vars if DB is empty (survives Coolify redeploys)
+    if (merchants.length === 0 && process.env.MERCHANT_NAME) {
+      try {
+        const seeded = db.createMerchant({
+          name: process.env.MERCHANT_NAME,
+          upi_id: process.env.MERCHANT_UPI_ID,
+          merchant_id: process.env.MERCHANT_ID,
+          api_token: process.env.MERCHANT_API_TOKEN,
+          api_cookie: process.env.MERCHANT_API_COOKIE,
+          bharatpe_api: process.env.MERCHANT_BHARATPE_API || null,
+          user_agent: 'UPI-Demo/1.0',
+        });
+        paymentService.registerMerchant(seeded);
+        merchants = [seeded];
+        console.log('[SEED] Merchant auto-created from env vars');
+      } catch (e) { console.error('[SEED] Failed:', e.message); }
+    }
+
     merchants.forEach(m => {
       try { paymentService.registerMerchant(m); }
       catch (err) { console.error(`[WARN] Failed to boot merchant ${m.id}:`, err.message); }
