@@ -13,6 +13,10 @@ const db = require('./database');
 const paymentService = require('./paymentService');
 const { buildUpiUri, generateQR, paymentCardHTML, paymentCardJS } = require('./qrHelper');
 
+console.log('[BOOT] All modules loaded');
+console.log('[BOOT] paymentService:', typeof paymentService);
+console.log('[BOOT] paymentService keys:', paymentService ? Object.keys(paymentService) : 'N/A');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
