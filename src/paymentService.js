@@ -15,6 +15,7 @@ const bharatpeAxios = axios.create({ httpsAgent: agent, timeout: 15000 });
 
 class PaymentService extends EventEmitter {
   constructor() {
+    super();
     this.lastTxns = new Map();
     this._listenersAttached = false;
     this._onSuccess = (data) => this.emit('payment:success', data);
