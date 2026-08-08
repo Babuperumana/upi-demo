@@ -1,0 +1,21 @@
+{
+  "name": "upi-demo",
+  "version": "1.0.0",
+  "description": "UPI Payment Demo App — Coolify-ready demo for @babuperumana/upipg-new",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@babuperumana/upipg-new": "^1.0.0",
+    "axios": "^1.7.0",
+    "better-sqlite3": "^13.0.2",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  }
+}
