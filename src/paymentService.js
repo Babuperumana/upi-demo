@@ -1,6 +1,6 @@
 /**
  * Payment Service for UPI Demo App
- * Uses @babuperumana/upipg UpiPG directly (bypasses the broken wrapper in upipg-new).
+ * Uses @babuperumana/upipg UpiPG directly — no broken wrapper.
  * Handles per-merchant instances, polling, SQLite persistence, and VPA enrichment.
  */
 
@@ -76,26 +76,20 @@ class PaymentService extends EventEmitter {
     this.pollLocks.delete(mid);
   }
 
-  createPayment(merchantId, options) {
+  async createPayment(merchantId, options) {
     const mid = this._mid(merchantId);
     let entry = this.gateways.get(mid);
     if (!entry) {
       const merchant = db.getMerchantById(mid);
-      if (!merchant) throw new Error('Merchant not found');
+      if (!merchant) throw new Error('Merchant not found in demo DB');
       this.registerMerchant(merchant);
       entry = this.gateways.get(mid);
     }
     if (!entry) throw new Error('Failed to initialize payment gateway');
 
     const session = await entry.pg.createPayment(options);
-    console.log('[DEBUG] createPayment session keys:', Object.keys(session));
-    console.log('[DEBUG] createPayment session.orderId:', session.orderId);
-    console.log('[DEBUG] createPayment session:', JSON.stringify(session).slice(0, 200));
-    if (!session || !session.orderId) {
-      throw new Error(`UpiPG returned invalid session: ${JSON.stringify(session)}`);
-    }
 
-    // Insert into demo's SQLite DB (UpiPG doesn't persist to DB)
+    // Insert into demo's SQLite DB (UpiPG doesn't persist)
     const payment = db.insertPayment(
       session.orderId, mid, session.baseAmount, session.sessionAmount, options.metadata || null
     );
