@@ -88,6 +88,9 @@ class PaymentService extends EventEmitter {
     if (!entry) throw new Error('Failed to initialize payment gateway');
 
     const session = await entry.pg.createPayment(options);
+    console.log('[DEBUG] createPayment session keys:', Object.keys(session));
+    console.log('[DEBUG] createPayment session.orderId:', session.orderId);
+    console.log('[DEBUG] createPayment session:', JSON.stringify(session).slice(0, 200));
     if (!session || !session.orderId) {
       throw new Error(`UpiPG returned invalid session: ${JSON.stringify(session)}`);
     }
